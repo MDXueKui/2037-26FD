@@ -2,7 +2,7 @@
  * @Author: pengdong 2019262928@qq.com
  * @Date: 2024-05-08 17:16:30
  * @LastEditors: pengdong 2019262928@qq.com
- * @LastEditTime: 2024-05-10 10:15:01
+ * @LastEditTime: 2024-05-13 11:01:31
  * @FilePath: \ediee:\pengdong\APM32F0xx_SDK_v1.7\Examples\RTOS\FreeRTOS\Source\uart_debug.c
  * @Description:
  * 版权声明 保留文件所有权利 2024
@@ -75,8 +75,6 @@ uint8_t g_usart_rx_buf[USART_REC_LEN];
  *  bit13~0，    接收到的有效字节数目
 */
 uint16_t g_usart_rx_sta = 0;
-
-uint8_t g_rx_buffer[RXBUFFERSIZE];  /* HAL库使用的串口接收缓冲 */
 
 /*!
  * @brief        serial port tramsimt data

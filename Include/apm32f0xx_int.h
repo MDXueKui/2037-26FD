@@ -1,3 +1,13 @@
+/*
+ * @Author: pengdong 2019262928@qq.com
+ * @Date: 2023-12-19 16:12:54
+ * @LastEditors: pengdong 2019262928@qq.com
+ * @LastEditTime: 2024-05-13 10:37:24
+ * @FilePath: \ediee:\pengdong\APM32F0xx_SDK_v1.7\Examples\RTOS\FreeRTOS\Include\apm32f0xx_int.h
+ * @Description:
+ * 版权声明 保留文件所有权利 2024
+ * Copyright (c) 2024 by ${东莞市禹顺智能科技有限公司}, All Rights Reserved.
+ */
 /*!
  * @file        apm32f0xx_int.h
  *
@@ -33,6 +43,7 @@ extern "C" {
 
 /* includes */
 #include "apm32f0xx.h"
+#include "btim.h"
 
 /** @addtogroup Examples
   @{

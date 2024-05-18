@@ -1,5 +1,6 @@
 #include "malloc.h"
 
+#if USE_MALLOC
 // /* 内存池(64字节对齐)*/
 static __attribute__ ((aligned (64))) uint8_t mem1base[MEM1_MAX_SIZE];   /* 内部SRAM内存池 */
 
@@ -228,7 +229,7 @@ void *myrealloc(uint8_t memx, void *ptr, uint32_t size)
         return (void *)((uint32_t)mallco_dev.membase[memx] + offset);   /* 返回新内存首地址 */
     }
 }
-
+#endif
 
 
 

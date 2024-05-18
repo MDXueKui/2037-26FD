@@ -561,16 +561,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Boards</GroupName>
-          <Files>
-            <File>
-              <FileName>Board.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Boards\Board.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>Application</GroupName>
           <Files>
             <File>
@@ -589,9 +579,29 @@
               <FilePath>..\..\Source\uart_debug.c</FilePath>
             </File>
             <File>
-              <FileName>malloc.c</FileName>
+              <FileName>btim.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\Source\malloc.c</FilePath>
+              <FilePath>..\..\Source\btim.c</FilePath>
+            </File>
+            <File>
+              <FileName>tm1650.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Source\tm1650.c</FilePath>
+            </File>
+            <File>
+              <FileName>buzzer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Source\buzzer.c</FilePath>
+            </File>
+            <File>
+              <FileName>input_scan.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Source\input_scan.c</FilePath>
+            </File>
+            <File>
+              <FileName>iwdg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Source\iwdg.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1202,16 +1212,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Boards</GroupName>
-          <Files>
-            <File>
-              <FileName>Board.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Boards\Board.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>Application</GroupName>
           <Files>
             <File>
@@ -1230,9 +1230,29 @@
               <FilePath>..\..\Source\uart_debug.c</FilePath>
             </File>
             <File>
-              <FileName>malloc.c</FileName>
+              <FileName>btim.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\Source\malloc.c</FilePath>
+              <FilePath>..\..\Source\btim.c</FilePath>
+            </File>
+            <File>
+              <FileName>tm1650.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Source\tm1650.c</FilePath>
+            </File>
+            <File>
+              <FileName>buzzer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Source\buzzer.c</FilePath>
+            </File>
+            <File>
+              <FileName>input_scan.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Source\input_scan.c</FilePath>
+            </File>
+            <File>
+              <FileName>iwdg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Source\iwdg.c</FilePath>
             </File>
           </Files>
         </Group>

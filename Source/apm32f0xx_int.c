@@ -89,7 +89,19 @@ void HardFault_Handler(void)
 {
 }
 
-
+/*!
+ * @brief        This function handles TMR14 Handler
+ *
+ * @param        None
+ *
+ * @retval       None
+ *
+ * @note
+ */
+void TMR6_IRQHandler(void)
+{
+    TMR6_Isr();
+}
 /**@} end of group FreeRTOS_INT_Functions */
 /**@} end of group FreeRTOS */
 /**@} end of group Examples */

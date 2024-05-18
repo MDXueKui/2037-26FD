@@ -78,7 +78,7 @@ extern unsigned int SystemCoreClock;
 /* 内存分配相关定义 */
 #define configSUPPORT_STATIC_ALLOCATION                 0                       /* 1: 支持静态申请内存, 默认: 0 */
 #define configSUPPORT_DYNAMIC_ALLOCATION                1                       /* 1: 支持动态申请内存, 默认: 1 */
-#define configTOTAL_HEAP_SIZE                           ((size_t)(4 * 1024))    /* FreeRTOS堆中可用的RAM总量, 单位: Byte, 无默认需定义 */
+#define configTOTAL_HEAP_SIZE                           ((size_t)(5 * 1024))    /* FreeRTOS堆中可用的RAM总量, 单位: Byte, 无默认需定义 */
 #define configAPPLICATION_ALLOCATED_HEAP                0                       /* 1: 用户手动分配FreeRTOS内存堆(ucHeap), 默认: 0 */
 #define configSTACK_ALLOCATION_FROM_SEPARATE_HEAP       0                       /* 1: 用户自行实现任务创建时使用的内存申请与释放函数, 默认: 0 */
 
@@ -93,11 +93,11 @@ extern unsigned int SystemCoreClock;
 #define configUSE_CO_ROUTINES       0
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
 
-/* Software timer definitions. */
-#define configUSE_TIMERS                1
-#define configTIMER_TASK_PRIORITY       ( 2 )
-#define configTIMER_QUEUE_LENGTH        10
-#define configTIMER_TASK_STACK_DEPTH    ( configMINIMAL_STACK_SIZE * 2 )
+/* 软件定时器相关定义 */
+#define configUSE_TIMERS                                1                               /* 1: 使能软件定时器, 默认: 0 */
+#define configTIMER_TASK_PRIORITY                       ( configMAX_PRIORITIES - 1 )    /* 定义软件定时器任务的优先级, 无默认configUSE_TIMERS为1时需定义 */
+#define configTIMER_QUEUE_LENGTH                        2                               /* 定义软件定时器命令队列的长度, 无默认configUSE_TIMERS为1时需定义 */
+#define configTIMER_TASK_STACK_DEPTH                    ( configMINIMAL_STACK_SIZE * 2) /* 定义软件定时器任务的栈空间大小, 无默认configUSE_TIMERS为1时需定义 */
 
 /* 可选函数, 1: 使能 */
 #define INCLUDE_vTaskPrioritySet                        1                       /* 设置任务优先级 */
@@ -119,6 +119,13 @@ extern unsigned int SystemCoreClock;
 #define INCLUDE_xTaskResumeFromISR                      1                       /* 恢复在中断中挂起的任务 */
 #define configUSE_TRACE_FACILITY                        1                       /* 获取所有任务的状态信息 */
 #define configUSE_STATS_FORMATTING_FUNCTIONS            1                       /* 用于以“表格”的形式获取系统中任务的信息 */
+#define configGENERATE_RUN_TIME_STATS                   1                       /* 使用 FreeRTOS 获取系统任务运行时间信息的 API 函数 */
+#if configGENERATE_RUN_TIME_STATS
+#include "btim.h"
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() ConfigureTimeForRunTimeStats()
+extern uint32_t FreeRTOSRunTimeTicks;
+#define portGET_RUN_TIME_COUNTER_VALUE() FreeRTOSRunTimeTicks
+#endif
 /* 中断嵌套行为配置 */
 #ifdef __NVIC_PRIO_BITS
     /* __BVIC_PRIO_BITS will be specified when CMSIS is being used. */
@@ -155,6 +162,10 @@ standard names. */
 #define vPortSVCHandler SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
 #define xPortSysTickHandler SysTick_Handler
+
+/* 断言 */
+#define vAssertCalled(char, int) printf("Error: %s, %d\r\n", char, int)
+#define configASSERT( x ) if( ( x ) == 0 ) vAssertCalled( __FILE__, __LINE__ )
 
 #endif /* FREERTOS_CONFIG_H */
 

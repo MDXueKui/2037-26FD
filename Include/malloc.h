@@ -28,6 +28,8 @@
 #include "stdint.h"
 #include "apm32f0xx.h"
 
+#define USE_MALLOC  0
+
 /* 定义1个内存池 */
 #define SRAMIN      0       /* 内部SRAM, 共64KB */
 #define SRAMBANK    1       /* 定义支持的SRAM块数. */
