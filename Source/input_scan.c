@@ -1,7 +1,10 @@
 #include "input_scan.h"
 #include "core_cm0plus.h"
+<<<<<<< HEAD
 #include "FreeRTOS.h"
 #include "event_groups.h"
+=======
+>>>>>>> e6b1db919a3404ff6bbfd9ab2115edcd36ea1229
 
 void input_scan_init(void)
 {
@@ -67,7 +70,12 @@ uint8_t input_scan(void)
 }
 
 TimerHandle_t Timer1Timer_Handler; /* 定时器1句柄 */
+<<<<<<< HEAD
 
+=======
+//extern TimerHandle_t Timer1Timer_Handler;
+uint8_t count = 0;
+>>>>>>> e6b1db919a3404ff6bbfd9ab2115edcd36ea1229
 /**
  * @brief       Timer1超时回调函数
  * @param       xTimer : 传入参数(未用到)
@@ -75,6 +83,7 @@ TimerHandle_t Timer1Timer_Handler; /* 定时器1句柄 */
  */
 void Timer1Callback(TimerHandle_t xTimer)
 {
+<<<<<<< HEAD
     printf("test\r\n");
     // count++;
     // printf("count = %d\n", count);
@@ -90,13 +99,30 @@ extern EventGroupHandle_t EventGroupHandler;
 void Input_Scan_Task(void *parameter)
 {
     taskENTER_CRITICAL();           /* 进入临界区 */
+=======
+    count++;
+    printf("count = %d\n", count);
+    if (count >= 5)
+    {
+     xTimerStop((TimerHandle_t)Timer1Timer_Handler, /* 待停止的定时器句柄 */
+                (TickType_t)portMAX_DELAY);         /* 等待系统停止定时器的最大时间 */
+    }
+}
+
+
+void Input_Scan_Task(void *parameter)
+{
+>>>>>>> e6b1db919a3404ff6bbfd9ab2115edcd36ea1229
     /* 定时器1创建为周期定时器 */
     Timer1Timer_Handler = xTimerCreate((const char*  )"Timer1",                 /* 定时器名 */
                                       (TickType_t   )1000,                      /* 定时器超时时间 */
                                       (UBaseType_t  )pdTRUE,                    /* 周期定时器 */
                                       (void*        )1,                         /* 定时器ID */
                                       (TimerCallbackFunction_t)Timer1Callback); /* 定时器回调函数 */
+<<<<<<< HEAD
     taskEXIT_CRITICAL();            /* 退出临界区 */
+=======
+>>>>>>> e6b1db919a3404ff6bbfd9ab2115edcd36ea1229
     BaseType_t timer_creat_state;
     printf("Input_Scan_Task start!\r\n");
     while (1)
@@ -107,8 +133,11 @@ void Input_Scan_Task(void *parameter)
         {
         case ADD_PRES:
             printf("ADD_PRES\r\n");
+<<<<<<< HEAD
             xEventGroupSetBits((EventGroupHandle_t  )EventGroupHandler, /* 待操作的事件标志组句柄 */
                    (EventBits_t         )(1 << 0));       /* 待设置的bit位 */
+=======
+>>>>>>> e6b1db919a3404ff6bbfd9ab2115edcd36ea1229
             if (tube_display_buff[0] < 9)
             {
                 tube_display_buff[0]++;

@@ -10,8 +10,11 @@
  */
 #include "tm1650.h"
 #include "tm1650_config.h"
+<<<<<<< HEAD
 #include "FreeRTOS.h"
 #include "event_groups.h"
+=======
+>>>>>>> e6b1db919a3404ff6bbfd9ab2115edcd36ea1229
 
 /* 往一个指定的数码管位写入指定的显示数据 */
 /* 共阴数码管段码表 */
@@ -215,13 +218,17 @@ void TM1650_print(uint8_t dig,uint8_t seg_data)
 	TM1650_IIC_stop();
 }
 
+<<<<<<< HEAD
 extern EventGroupHandle_t EventGroupHandler;
 
+=======
+>>>>>>> e6b1db919a3404ff6bbfd9ab2115edcd36ea1229
 void Dispaly_Task(void* parameter)
 {
 	printf("Dispaly_Task start!\r\n");
 	while(1)
 	{
+<<<<<<< HEAD
         xEventGroupWaitBits((EventGroupHandle_t )EventGroupHandler, /* 等待的事件标志组句柄 */
                     (EventBits_t        )((1 << 0)),      /* 等待的事件 */
                     (BaseType_t         )pdTRUE,            /* 函数退出时清零等待的事件 */
@@ -229,6 +236,10 @@ void Dispaly_Task(void* parameter)
                     (TickType_t         )portMAX_DELAY);    /* 等待时间 */
 		printf("Dispaly_Task start_test!\n");
         IWDT_Feed();
+=======
+//		printf("Dispaly_Task start_test!\n");
+//        IWDT_Feed();
+>>>>>>> e6b1db919a3404ff6bbfd9ab2115edcd36ea1229
 		TM1650_cfg_display(TM1650_BRIGHT1);
 		TM1650_print(TM1650_DIG1, TUBE_TABLE_0[tube_display_buff[0]]);
 		TM1650_print(TM1650_DIG2, TUBE_TABLE_0[tube_display_buff[1]]);
