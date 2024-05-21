@@ -1,2 +1,4 @@
 /Project/MDK/*
 !RTOS_FreeRTOS.uvprojx
+
+/.vscode/

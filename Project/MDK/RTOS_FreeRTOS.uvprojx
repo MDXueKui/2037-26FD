@@ -603,6 +603,21 @@
               <FileType>1</FileType>
               <FilePath>..\..\Source\iwdg.c</FilePath>
             </File>
+            <File>
+              <FileName>rf_receive.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Source\rf_receive.c</FilePath>
+            </File>
+            <File>
+              <FileName>flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Source\flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>gpio_output.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Source\gpio_output.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1253,6 +1268,21 @@
               <FileName>iwdg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\Source\iwdg.c</FilePath>
+            </File>
+            <File>
+              <FileName>rf_receive.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Source\rf_receive.c</FilePath>
+            </File>
+            <File>
+              <FileName>flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Source\flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>gpio_output.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Source\gpio_output.c</FilePath>
             </File>
           </Files>
         </Group>

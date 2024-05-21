@@ -1,18 +1,17 @@
 #include "rf_receive.h"
+#include "gpio_output.h"
 
 #define id_data_max 10
-
-uint8_t learn_flag = 0;	/* 学码模式开启标志 */
 uint8_t g_rec_long = 0;
 static uint8_t g_data_recling[8] = {0};
 static uint8_t g_data_recbuf[8] = {0};
 uint8_t g_rec_time = 0;
 uint8_t g_rec_timesave = 0;
 uint8_t g_rec_save = 0;
-uint8_t g_rec_fg = 0;
-uint8_t g_out_fg1 = 0;
 uint8_t g_out_data1 = 0;
 static uint32_t id_data[id_data_max] = {0};
+extern EventGroupHandle_t EventGroupHandler;
+#define receive_eventbit_0      (1 << 0)            /* 事件位 */
 
 /**
  * @description: 上电后从0x0800FC00这个flash地址开始
@@ -88,15 +87,16 @@ void rf_receive_Init(void)
 
 	/* enable the timer interrupt */
 	TMR_EnableInterrupt(TMR3, TMR_INT_CH2);
-	NVIC_EnableIRQRequest(TMR3_IRQn, 3);
+	NVIC_EnableIRQRequest(TMR3_IRQn, 1);
 
     // /*  Enable TMR3  */
     TMR_Enable(TMR3);
 }
 
 /**
- * @description: 定时器3中断服务函数，负责接收处理rf信号
- * @return {*}
+ * @brief       定时器3中断服务函数，负责接收处理rf信号
+ * @param       pvParameters : 传入参数(未用到)
+ * @retval      无
  */
 void TMR3_IRQHandler(void)
 {
@@ -105,6 +105,7 @@ void TMR3_IRQHandler(void)
 		uint32_t data_time = 0;
 		data_time = TMR_ReadCaputer2(TMR3);
 		static uint8_t rec_ing = 0;
+        BaseType_t xHigherPriorityTaskWoken, xResult;
 		/* 禹顺协议，允许±100us的偏差 */
 		if((316 <= data_time )&& (data_time <= 516))
 		{
@@ -133,14 +134,23 @@ void TMR3_IRQHandler(void)
 
 			if(g_rec_long == 56)
 			{
-				g_rec_fg = 1;
+//				g_rec_fg = 1;
 				for(uint8_t i = 0; i < 7; i++)
 				{
-					// printf("the data is 0x%02x\n", g_data_recling[i]);
+//					printf("the data is 0x%02x\n", g_data_recling[i]);
 					g_data_recbuf[i] = g_data_recling[i];
 				}
-				g_rec_timesave = g_rec_time;
+                g_rec_timesave = g_rec_time;
 				g_rec_time = 0;
+                xHigherPriorityTaskWoken = pdFALSE;
+                xResult = xEventGroupSetBitsFromISR(EventGroupHandler, receive_eventbit_0, &xHigherPriorityTaskWoken);
+//                printf("xResult = %ld\r\n", xResult);
+                /* 信息是否发送成功 */
+                if ( xResult != pdFAIL )
+                {
+                    /* 如果 xHigherPriorityTaskWoken 的值为 pdTRUE 则进行一次上下文切换*/
+                    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+                }
 			}
 			TMR_SetCounter(TMR3, 0);
 		}
@@ -173,7 +183,7 @@ void learn_idcode(uint32_t id_dataing)
 		{
 			id_data[i] = id_dataing;
 			flash_write_word(flash_eeprom_base + i * 4, id_data[i]);
-			// printf("flash_id_data = 0x%08x\n", flash_read_word(flash_eeprom_base + i * 4));
+			printf("flash_id_data = 0x%08x\n", flash_read_word(flash_eeprom_base + i * 4));
 			break;
 		}
 	}
@@ -189,7 +199,7 @@ void learn_idcode(uint32_t id_dataing)
 			flash_write_word(flash_eeprom_base + i * 4, id_data[i]);
 		}
 	}
-	learn_flag = 0;
+	set_learn_eventbit_1(0);
 	buzzer_quick_3s();
 }
 
@@ -216,66 +226,8 @@ void delete_idcode(uint32_t id_dataing)
 	{
 		flash_write_word(flash_eeprom_base + i * 4, id_data[i]);
 	}
-	learn_flag = 0;
+	set_learn_eventbit_1(0);
 	buzzer_quick_3s();
-}
-
-
-/**
- * @description: rf接收处理函数，当接收完一帧数据后进行处理
- * @return {*}
- */
-void rec_pro_ys(void)
-{
-	uint8_t i = 0;
-	uint8_t crc = 0;
-	uint32_t id_dataing = 0x00;
-	id_dataing = (g_data_recbuf[2] << 24) + (g_data_recbuf[3] << 16) + (g_data_recbuf[4] << 8);
-	// printf("id_dataing = 0x%08x\n", id_dataing);
-	if((g_data_recbuf[1] == 0xe5))
-	{
-		if(g_data_recbuf[5] == 0x11 && learn_flag == 1)
-		{
-			learn_idcode(id_dataing);
-		}
-		else if (g_data_recbuf[5] == 0x14 && learn_flag == 1)
-		{
-			delete_idcode(id_dataing);
-		}
-		else
-		{
-			for(i = 0; i < id_data_max; i++)
-			{
-				if(id_dataing == id_data[i])
-				{
-					/* 会接收三帧数据，当接收到一帧就将引导码更改，阻止校验
-					 * 防止单片机重复响应改命令
-					 */
-					if(g_data_recbuf[5] == g_rec_save)
-					{
-						if(g_rec_timesave<60)
-						{
-							g_data_recbuf[1] = 0xaa;
-						}
-					}
-					else
-					{
-						g_rec_save = g_data_recbuf[5];
-					}
-					for(i = 0; i < 7; i++)
-					{
-						crc ^= g_data_recbuf[i];
-					}
-					if(!crc)
-					{
-						g_out_fg1 = 1;
-						g_out_data1 = g_data_recbuf[5] & 0x0f;
-					}
-					break;
-				}
-			}
-		}
-	}
 }
 
 void rf_data_pro(void)
@@ -293,9 +245,9 @@ void rf_data_pro(void)
 			{
 				motor_up();
 				BUZZER(1);
-				fire_flag = 1;
+				set_fire_eventbit7(1);
 			}
-			else if(tube_display_buff[0] == 6 && (!fire_flag))
+			else if(tube_display_buff[0] == 6 && (!get_fire_eventbit7))
 			{
 				motor_up();
 			}
@@ -310,7 +262,7 @@ void rf_data_pro(void)
 			{
 				motor_stop();
 			}
-			else if(tube_display_buff[0] == 6 && (!fire_flag))
+			else if(tube_display_buff[0] == 6 && (!get_fire_eventbit7))
 			{
 				motor_stop();
 			}
@@ -325,7 +277,7 @@ void rf_data_pro(void)
 			{
 				motor_down();
 			}
-			else if(tube_display_buff[0] == 6 && (!fire_flag))
+			else if(tube_display_buff[0] == 6 && (!get_fire_eventbit7))
 			{
 				motor_down();
 			}
@@ -343,5 +295,72 @@ void rf_data_pro(void)
 		default:
 			break;
 	}
-	g_out_fg1 = 0;
+}
+
+
+/**
+ * @description: rf接收处理任务，当接收完一帧数据后进行处理
+ * @return {*}
+ */
+void Rf_Rec_Pro_Task(void *parameter)
+{
+    printf("Rf_Rec_Pro_Task start!\r\n");
+    while(1)
+    {
+        xEventGroupWaitBits((EventGroupHandle_t )EventGroupHandler, /* 等待的事件标志组句柄 */
+                            (EventBits_t        )receive_eventbit_0,      /* 等待的事件 */
+                            (BaseType_t         )pdTRUE,            /* 函数退出时清零等待的事件 */
+                            (BaseType_t         )pdTRUE,            /* 等待等待的事件中的所有事件 */
+                            (TickType_t         )portMAX_DELAY);    /* 等待时间 */
+        uint8_t i = 0;
+        uint8_t crc = 0;
+        uint32_t id_dataing = 0x00;
+        id_dataing = (g_data_recbuf[2] << 24) + (g_data_recbuf[3] << 16) + (g_data_recbuf[4] << 8);
+        // printf("id_dataing = 0x%08x\n", id_dataing);
+        if((g_data_recbuf[1] == 0xe5))
+        {
+            if(g_data_recbuf[5] == 0x11 && get_learn_eventbit_1)
+            {
+                learn_idcode(id_dataing);
+            }
+            else if (g_data_recbuf[5] == 0x14 && get_learn_eventbit_1)
+            {
+                delete_idcode(id_dataing);
+            }
+            else
+            {
+                for(i = 0; i < id_data_max; i++)
+                {
+                    if(id_dataing == id_data[i])
+                    {
+                        /* 会接收三帧数据，当接收到一帧就将引导码更改，阻止校验
+                         * 防止单片机重复响应改命令
+                         */
+                        if(g_data_recbuf[5] == g_rec_save)
+                        {
+                            if(g_rec_timesave<60)
+                            {
+                                g_data_recbuf[1] = 0xaa;
+                            }
+                        }
+                        else
+                        {
+                            g_rec_save = g_data_recbuf[5];
+                        }
+                        for(i = 0; i < 7; i++)
+                        {
+                            crc ^= g_data_recbuf[i];
+                        }
+                        if(!crc)
+                        {
+                            g_out_data1 = g_data_recbuf[5] & 0x0f;
+                            // printf("data = 0x%02x\r\n", g_out_data1);
+                            rf_data_pro();
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }

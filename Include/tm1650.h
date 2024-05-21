@@ -2,8 +2,8 @@
  * @Author: pengdong 2019262928@qq.com
  * @Date: 2024-04-09 13:47:50
  * @LastEditors: pengdong 2019262928@qq.com
- * @LastEditTime: 2024-05-06 19:57:06
- * @FilePath: \MDKe:\pengdong\APM32F0xx_SDK_v1.7\Examples\GPIO\GPIO_Toggle\Include\tm1650.h
+ * @LastEditTime: 2024-05-21 11:50:09
+ * @FilePath: \FreeRTOS\Include\tm1650.h
  * @Description: 数码管驱动程序头文件
  * 版权声明 保留文件所有权利 2024
  * Copyright (c) 2024 by ${东莞市禹顺智能科技有限公司}, All Rights Reserved.
@@ -16,6 +16,72 @@
 #include "uart_debug.h"
 #include "input_scan.h"
 #include "iwdg.h"
+
+#define flashw_eventbit3        			(1 << 3)
+#define set_flashw_eventbit3(x) 			\
+											do{ x ? \
+												(xEventGroupSetBits(EventGroupHandler, flashw_eventbit3)) : \
+												(xEventGroupClearBits(EventGroupHandler, flashw_eventbit3)); \
+											}while(0)
+
+#define get_flashw_eventbit3    			(xEventGroupGetBits(EventGroupHandler) & flashw_eventbit3)
+
+#define on_eventbit4            			(1 << 4)
+#define set_on_eventbit4(x)     			\
+											do{ x ? \
+												(xEventGroupSetBits(EventGroupHandler, on_eventbit4)) : \
+												(xEventGroupClearBits(EventGroupHandler, on_eventbit4)); \
+											}while(0)
+
+#define get_on_eventbit4        			(xEventGroupGetBits(EventGroupHandler) & on_eventbit4)
+
+
+#define off_eventbit5           			(1 << 5)
+#define set_off_eventbit5(x)    			\
+											do{ x ? \
+												(xEventGroupSetBits(EventGroupHandler, off_eventbit5)) : \
+												(xEventGroupClearBits(EventGroupHandler, off_eventbit5)); \
+											}while(0)
+
+#define get_off_eventbit5       		   	(xEventGroupGetBits(EventGroupHandler) & off_eventbit5)
+
+#define scintillation_eventbit6            	(1 << 6)
+#define set_scintillation_eventbit6(x)    	 \
+											do{ x ? \
+												(xEventGroupSetBits(EventGroupHandler, scintillation_eventbit6)) : \
+												(xEventGroupClearBits(EventGroupHandler, scintillation_eventbit6)); \
+											}while(0)
+
+#define get_scintillation_eventbit6      	(xEventGroupGetBits(EventGroupHandler) & scintillation_eventbit6)
+
+#define fire_eventbit7            			(1 << 7)
+#define set_fire_eventbit7(x)    			\
+											do{ x ? \
+												(xEventGroupSetBits(EventGroupHandler, fire_eventbit7)) : \
+												(xEventGroupClearBits(EventGroupHandler, fire_eventbit7)); \
+											}while(0)
+
+#define get_fire_eventbit7      			(xEventGroupGetBits(EventGroupHandler) & fire_eventbit7)
+
+#define aging_eventbit8            			(1 << 8)
+#define set_aging_eventbit8(x)    			\
+											do{ x ? \
+												(xEventGroupSetBits(EventGroupHandler, aging_eventbit8)) : \
+												(xEventGroupClearBits(EventGroupHandler, aging_eventbit8)); \
+											}while(0)
+
+#define get_aging_eventbit8      			(xEventGroupGetBits(EventGroupHandler) & aging_eventbit8)
+
+#define loaded_eventbit9            		(1 << 9)
+#define set_loaded_eventbit9(x)    			\
+											do{ x ? \
+												(xEventGroupSetBits(EventGroupHandler, loaded_eventbit9)) : \
+												(xEventGroupClearBits(EventGroupHandler, loaded_eventbit9)); \
+											}while(0)
+
+#define get_loaded_eventbit9      			(xEventGroupGetBits(EventGroupHandler) & loaded_eventbit9)
+
+
 
 //显示参数
 #define TM1650_BRIGHT1       0x11   /*一级亮度，打开LED显示*/
@@ -37,18 +103,17 @@
 //extern const uint8_t TUBE_TABLE_0[17];
 //extern uint8_t tube_change_flag;
 extern uint16_t tube_display_buff[4];
-//extern uint32_t scintillation_time;
-//extern uint8_t scintillation_time_count;
-//extern uint16_t up_time_buff;
-//extern uint16_t down_time_buff;
-//extern uint16_t fire_time_buff;
-//extern uint16_t aging_time_buff;
-//extern uint8_t aging_flag;
-//extern uint32_t aging_time_count;
-//extern uint8_t aging_mode;
-//extern uint16_t temp_time_buff;
-//extern uint8_t scintillation_flag;
-//extern uint16_t ManualAuto_flag;
+extern uint32_t scintillation_time;
+extern uint8_t scintillation_time_count;
+extern uint16_t up_time_buff;
+extern uint16_t down_time_buff;
+extern uint16_t fire_time_buff;
+extern uint16_t aging_time_buff;
+extern uint16_t ManualAuto_flag;
+extern uint32_t aging_time_count;
+extern uint8_t aging_mode;
+extern uint16_t temp_time_buff;
+extern uint32_t on_off_time_count; /* 电机上行下行时间计数变量 */
 
 void TM1650_init(void);
 void TM1650_cfg_display(uint8_t param);

@@ -2,14 +2,16 @@
  * @Author: pengdong 2019262928@qq.com
  * @Date: 2024-04-09 13:46:58
  * @LastEditors: pengdong 2019262928@qq.com
- * @LastEditTime: 2024-05-16 15:56:58
- * @FilePath: \ediee:\pengdong\APM32F0xx_SDK_v1.7\Examples\RTOS\FreeRTOS\Source\tm1650.c
+ * @LastEditTime: 2024-05-21 11:51:16
+ * @FilePath: \FreeRTOS\Source\tm1650.c
  * @Description:
  * 版权声明 保留文件所有权利 2024
  * Copyright (c) 2024 by ${东莞市禹顺智能科技有限公司}, All Rights Reserved.
  */
 #include "tm1650.h"
 #include "tm1650_config.h"
+#include "flash.h"
+#include "gpio_output.h"
 #include "FreeRTOS.h"
 #include "event_groups.h"
 
@@ -18,21 +20,20 @@
 /* 此处不知道是不是数码管接错了  现在的变化示例：1   0000 0110    6、7位  2、3位分别反过来后交换位置 */
 /* 这个地方如果数码管接对了直接用通用的数就行 */
 const uint8_t TUBE_TABLE_0[17] = {0xf3,0x82,0x5b,0xcb,0xaa,0xe9,0xf9,0x83,0xfb,0xeb,0xbb,0xf8,0x71,0xda,0x79,0x39, 0x00};
+extern EventGroupHandle_t EventGroupHandler;
 
 uint16_t tube_display_buff[4] = {0, 0, 0, 0};
 uint16_t up_time_buff = 30;  /* 电机上行时间 */
 uint16_t down_time_buff = 30;  /* 电机下行时间 */
 uint16_t fire_time_buff = 10;  /* 消防上行时间 */
 uint16_t aging_time_buff = 10;	/* 老化时间 */
-uint16_t ManualAuto_flag = 0; /* 手动自动模式标志位 */
+uint16_t ManualAuto_flag = 0; /* 手动和自动模式切换标准位 */
 uint16_t temp_time_buff = 1000;  /* 为了老化时间的显示逻辑正常，所以设置为1000 */
-uint8_t aging_flag = 0;
+uint32_t on_off_time_count = 0; /* 电机上行下行时间计数变量 */
 uint32_t aging_time_count = 0;
 uint8_t aging_mode = 0;
-uint8_t tube_change_flag = 0;  /* 数码管刷新显示标志 */
-uint8_t scintillation_flag = 0;  /* 设置时间是数码管闪烁显示的标志 */
 uint32_t scintillation_time = 0; /* 放在systick中用于控制闪烁和判断设置时间的变量 */
-uint8_t scintillation_time_count = 0;
+uint8_t scintillation_time_count = 0; /* 用于记录闪烁时间的变量，单位：S */
 #define tm1650_max 6
 uint16_t *point[tm1650_max] = {&tube_display_buff[0], &up_time_buff, &down_time_buff, &fire_time_buff, &aging_time_buff, &ManualAuto_flag};
 
@@ -41,49 +42,56 @@ uint16_t *point[tm1650_max] = {&tube_display_buff[0], &up_time_buff, &down_time_
  *								 从对应的flash地址中取出
  * @return {*}
  */
-//void tm1650_data_init(void)
-//{
-//	uint32_t tm1650_data_addr = 0x0800f800;
-//	uint8_t i = 0;
-//	/* Unlock Flash for Clear or Write*/
-//    FMC_Unlock();
+void tm1650_data_init(void)
+{
+	uint32_t tm1650_data_addr = 0x0800f800;
+	uint8_t i = 0;
+	/* Unlock Flash for Clear or Write*/
+    FMC_Unlock();
 
-//	for(i = 0; i < tm1650_max; i++)
-//	{
-//		*point[i] = flash_read_halfword(tm1650_data_addr + i * 2);
-//		printf("flash_addr = 0x%08x,flash_id_data = %d\n", tm1650_data_addr + i * 2, *point[i]);
-//	}
+	for(i = 0; i < tm1650_max; i++)
+	{
+		*point[i] = flash_read_halfword(tm1650_data_addr + i * 2);
+		printf("flash_addr = 0x%08x,flash_id_data = %d\n", tm1650_data_addr + i * 2, *point[i]);
+	}
 
-//	/* Lock Flash*/
-//    FMC_Lock();
-//}
+	if(*point[0] == 6)
+    {
+        motor_down();
+        temp_time_buff = down_time_buff;
+        set_loaded_eventbit9(1);
+    }
+
+	/* Lock Flash*/
+    FMC_Lock();
+}
 
 /**
  * @description: 将模式值，电机上行时间，下行时间，消防时间，老化时间
  *								 写入对应的flash地址
  * @return {*}
  */
-//void tm1650_data_write(void)
-//{
-//	uint32_t tm1650_data_addr = 0x0800f800;
-//	FMC_Unlock();
-//	FMC_ErasePage(tm1650_data_addr);
-//	FMC_Lock();
-//	uint8_t i = 0;
-//	for(i = 0; i < tm1650_max; i++)
-//	{
-//		if((on_flag == 1 || off_flag == 1) && i == 0)
-//		{
-//			flash_write_halfword(tm1650_data_addr + i * 2, 2);
-//		}
-//		else
-//		{
-//			flash_write_halfword(tm1650_data_addr + i * 2, *point[i]);
-//		}
-//		printf("flash_addr = 0x%08x,flash_id_data = %d\n", tm1650_data_addr + i * 2, flash_read_halfword(tm1650_data_addr + i * 2));
-//	}
-
-//}
+void tm1650_data_write(void)
+{
+	uint32_t tm1650_data_addr = 0x0800f800;
+	FMC_Unlock();
+	FMC_ErasePage(tm1650_data_addr);
+	FMC_Lock();
+	uint8_t i = 0;
+	for(i = 0; i < tm1650_max; i++)
+	{
+		if(((xEventGroupGetBits(EventGroupHandler) & on_eventbit4) || \
+            (xEventGroupGetBits(EventGroupHandler) & off_eventbit5)) && i == 0)
+		{
+			flash_write_halfword(tm1650_data_addr + i * 2, 2);
+		}
+		else
+		{
+			flash_write_halfword(tm1650_data_addr + i * 2, *point[i]);
+		}
+		printf("flash_addr = 0x%08x,flash_id_data = %d\n", tm1650_data_addr + i * 2, flash_read_halfword(tm1650_data_addr + i * 2));
+	}
+}
 
 /**
  * @description: 产生IIC总线起始信号
@@ -152,7 +160,7 @@ static uint8_t TM1650_IIC_wait_ack(void)
  */
 void TM1650_init(void)
 {
-//	tm1650_data_init();
+	tm1650_data_init();
 	GPIO_Config_T gpioConfig;
 
     RCM_EnableAHBPeriphClock(TM1650_IIC_SCL_CLK);
@@ -198,7 +206,7 @@ void TM1650_clear(void)
 	uint8_t dig;
 	for(dig = TM1650_DIG1 ; dig<= TM1650_DIG4 ;dig++)
 	{
-		TM1650_print(dig,TUBE_TABLE_0[2]);
+		TM1650_print(dig,TUBE_TABLE_0[0]);
 	}
 }
 
@@ -215,189 +223,186 @@ void TM1650_print(uint8_t dig,uint8_t seg_data)
 	TM1650_IIC_stop();
 }
 
-extern EventGroupHandle_t EventGroupHandler;
-
-void Dispaly_Task(void* parameter)
+void display_change(uint16_t buff)
 {
-	printf("Dispaly_Task start!\r\n");
-	while(1)
+    tube_display_buff[1] = buff/100;
+    tube_display_buff[2] = buff%100/10;
+    tube_display_buff[3] = buff%10;
+}
+
+void mode_judge(void)
+{
+
+	if(ManualAuto_flag)
 	{
-        xEventGroupWaitBits((EventGroupHandle_t )EventGroupHandler, /* 等待的事件标志组句柄 */
-                    (EventBits_t        )((1 << 0)),      /* 等待的事件 */
-                    (BaseType_t         )pdTRUE,            /* 函数退出时清零等待的事件 */
-                    (BaseType_t         )pdTRUE,            /* 等待等待的事件中的所有事件 */
-                    (TickType_t         )portMAX_DELAY);    /* 等待时间 */
-		printf("Dispaly_Task start_test!\n");
-        IWDT_Feed();
-		TM1650_cfg_display(TM1650_BRIGHT1);
-		TM1650_print(TM1650_DIG1, TUBE_TABLE_0[tube_display_buff[0]]);
-		TM1650_print(TM1650_DIG2, TUBE_TABLE_0[tube_display_buff[1]]);
-		TM1650_print(TM1650_DIG3, TUBE_TABLE_0[tube_display_buff[2]]);
-		TM1650_print(TM1650_DIG4, TUBE_TABLE_0[tube_display_buff[3]]);
-		vTaskDelay(20);
+		LED4(0);
+	}
+	else
+	{
+		LED4(1);
+	}
+
+	switch(tube_display_buff[0])
+	{
+		case 1:
+			display_change(0);
+			break;
+		case 2:
+			if(get_aging_eventbit8)
+			{
+				set_aging_eventbit8(0);
+				aging_mode = 0;
+                aging_time_count = 0;
+				motor_stop();
+				display_change(0);
+			}
+			else
+			{
+				display_change(0);
+			}
+			break;
+		case 3:
+			display_change(up_time_buff);
+			break;
+		case 4:
+			display_change(down_time_buff);
+			break;
+		case 5:
+			if(get_fire_eventbit7)
+			{
+				display_change(temp_time_buff);
+			}
+			else
+			{
+				if(get_aging_eventbit8)
+				{
+					set_aging_eventbit8(0);
+					aging_mode = 0;
+					aging_time_count = 0;
+					motor_stop();
+					display_change(0);
+				}
+				motor_stop();
+				display_change(fire_time_buff);
+			}
+			break;
+		case 6:
+			display_change(0);
+			break;
+		case 7:
+			if(get_on_eventbit4)
+			{
+				display_change(temp_time_buff);
+			}
+			else
+			{
+				motor_stop();
+				display_change(0);
+			}
+			break;
+		case 8:
+			if(get_off_eventbit5)
+			{
+				display_change(temp_time_buff);
+			}
+			else
+			{
+				set_aging_eventbit8(0);
+				aging_mode = 0;
+                aging_time_count = 0;
+                temp_time_buff = 1000;
+				motor_stop();
+				display_change(0);
+			}
+			break;
+		case 9:
+			if(get_scintillation_eventbit6)
+			{
+				set_aging_eventbit8(0);
+				temp_time_buff = 1000;
+				aging_time_count = 0;
+			}
+			else
+			{
+				set_aging_eventbit8(1);
+			}
+			if(get_aging_eventbit8)
+			{
+				if(temp_time_buff == 1000)
+				{
+					temp_time_buff = aging_time_buff;
+				}
+				display_change(temp_time_buff);
+			}
+			else
+			{
+				display_change(aging_time_buff);
+			}
+			break;
+		default:
+			display_change(0);
+			break;
 	}
 }
 
-//void display_change(uint16_t buff)
-//{
-//    tube_display_buff[1] = buff/100;
-//    tube_display_buff[2] = buff%100/10;
-//    tube_display_buff[3] = buff%10;
-//}
+void tube_display(void)
+{
+	mode_judge();
+	TM1650_cfg_display(TM1650_BRIGHT1);
+	TM1650_print(TM1650_DIG1, TUBE_TABLE_0[tube_display_buff[0]]);
+	TM1650_print(TM1650_DIG2, TUBE_TABLE_0[tube_display_buff[1]]);
+	TM1650_print(TM1650_DIG3, TUBE_TABLE_0[tube_display_buff[2]]);
+	TM1650_print(TM1650_DIG4, TUBE_TABLE_0[tube_display_buff[3]]);
+}
 
-//void clear_all_flag(void)
-//{
-//	on_flag = 0;
-//	off_flag = 0;
-//	scintillation_flag = 0;
-//}
+/**
+ * @description: 数码管闪烁显示模式，每0.5s闪烁一次
+ * @return {*}
+ */
+void tube_scintillation_display(void)
+{
+	mode_judge();
+    if(scintillation_time_count >= 5)
+    {
+        scintillation_time_count = 0;
+        set_scintillation_eventbit6(0);
+        scintillation_time = 0;
+		set_flashw_eventbit3(1);
+    }
+	else if(scintillation_time < 500)
+	{
+		TM1650_print(TM1650_DIG2, TUBE_TABLE_0[16]);
+		TM1650_print(TM1650_DIG3, TUBE_TABLE_0[16]);
+		TM1650_print(TM1650_DIG4, TUBE_TABLE_0[16]);
+	}
+	else if(scintillation_time >= 500)
+	{
+		TM1650_print(TM1650_DIG2, TUBE_TABLE_0[tube_display_buff[1]]);
+		TM1650_print(TM1650_DIG3, TUBE_TABLE_0[tube_display_buff[2]]);
+		TM1650_print(TM1650_DIG4, TUBE_TABLE_0[tube_display_buff[3]]);
+	}
+}
 
-//void mode_judge(void)
-//{
-
-//	if(ManualAuto_flag)
-//	{
-//		LED4(0);
-//	}
-//	else
-//	{
-//		LED4(1);
-//	}
-
-//   switch(tube_display_buff[0])
-//	{
-//		case 1:
-//			display_change(0);
-//			break;
-//		case 2:
-//			if(aging_flag == 1)
-//			{
-//				aging_flag = 0;
-//				aging_mode = 0;
-//                aging_time_count = 0;
-//				motor_stop();
-//				display_change(0);
-//			}
-//			else
-//			{
-//				display_change(0);
-//			}
-//			break;
-//		case 3:
-//			display_change(up_time_buff);
-//			break;
-//		case 4:
-//			display_change(down_time_buff);
-//			break;
-//		case 5:
-//			if(fire_flag)
-//			{
-//				display_change(temp_time_buff);
-//			}
-//			else
-//			{
-//				if(aging_flag == 1)
-//				{
-//					aging_flag = 0;
-//					aging_mode = 0;
-//					aging_time_count = 0;
-//					motor_stop();
-//					display_change(0);
-//				}
-//				motor_stop();
-//				display_change(fire_time_buff);
-//			}
-//			break;
-//		case 7:
-//			if(on_flag)
-//			{
-//				display_change(temp_time_buff);
-//			}
-//			else
-//			{
-//				motor_stop();
-//				display_change(0);
-//			}
-//			break;
-//		case 8:
-//			if(off_flag)
-//			{
-//				display_change(temp_time_buff);
-//			}
-//			else
-//			{
-//				aging_flag = 0;
-//				aging_mode = 0;
-//                aging_time_count = 0;
-//                temp_time_buff = 1000;
-//				motor_stop();
-//				display_change(0);
-//			}
-//			break;
-//		case 9:
-//			if(scintillation_flag == 1)
-//			{
-//				aging_flag = 0;
-//				temp_time_buff = 1000;
-//				aging_time_count = 0;
-//			}
-//			else
-//			{
-//				aging_flag = 1;
-//			}
-//			if(aging_flag)
-//			{
-//				if(temp_time_buff == 1000)
-//				{
-//					temp_time_buff = aging_time_buff;
-//				}
-//				display_change(temp_time_buff);
-//			}
-//			else
-//			{
-//				display_change(aging_time_buff);
-//			}
-//			break;
-//		default:
-//			display_change(0);
-//			break;
-//	}
-//}
-
-//void tube_display(void)
-//{
-//	mode_judge();
-//	TM1650_cfg_display(TM1650_BRIGHT1);
-//	TM1650_print(TM1650_DIG1, TUBE_TABLE_0[tube_display_buff[0]]);
-//	TM1650_print(TM1650_DIG2, TUBE_TABLE_0[tube_display_buff[1]]);
-//	TM1650_print(TM1650_DIG3, TUBE_TABLE_0[tube_display_buff[2]]);
-//	TM1650_print(TM1650_DIG4, TUBE_TABLE_0[tube_display_buff[3]]);
-//}
-
-///**
-// * @description: 数码管闪烁显示模式，每0.5s闪烁一次
-// * @return {*}
-// */
-//void tube_scintillation_display(void)
-//{
-//	mode_judge();
-//    if(scintillation_time_count >= 5)
-//    {
-//        scintillation_time_count = 0;
-//        scintillation_flag = 0;
-//        scintillation_time = 0;
-//        tube_change_flag = 1;
-//    }
-//	if(scintillation_time < 500)
-//	{
-//		TM1650_print(TM1650_DIG2, TUBE_TABLE_0[16]);
-//		TM1650_print(TM1650_DIG3, TUBE_TABLE_0[16]);
-//		TM1650_print(TM1650_DIG4, TUBE_TABLE_0[16]);
-//	}
-//	if(scintillation_time >= 500)
-//	{
-//		TM1650_print(TM1650_DIG2, TUBE_TABLE_0[tube_display_buff[1]]);
-//		TM1650_print(TM1650_DIG3, TUBE_TABLE_0[tube_display_buff[2]]);
-//		TM1650_print(TM1650_DIG4, TUBE_TABLE_0[tube_display_buff[3]]);
-//	}
-//}
+void Dispaly_Task(void *parameter)
+{
+    buzzer_quick_100ms();
+	printf("Dispaly_Task start!\r\n");
+    while(1)
+    {
+		IWDT_Feed();
+        if(get_flashw_eventbit3)
+        {
+            tm1650_data_write();
+            xEventGroupClearBits(EventGroupHandler, flashw_eventbit3);
+        }
+        if(get_scintillation_eventbit6)
+		{
+			tube_scintillation_display();
+		}
+		else
+		{
+			tube_display();
+		}
+        vTaskDelay(20);
+    }
+}
