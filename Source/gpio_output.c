@@ -116,6 +116,7 @@ void motor_stop(void)
     LED3(0);
     UPOUT1(0);
     DNOUT1(0);
+    set_loaded_eventbit9(0);
     // cascaded_outputA(0);
     // cascaded_outputB(0);
 }

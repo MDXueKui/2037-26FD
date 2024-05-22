@@ -2,8 +2,8 @@
  * @Author: pengdong 2019262928@qq.com
  * @Date: 2024-04-09 13:46:58
  * @LastEditors: pengdong 2019262928@qq.com
- * @LastEditTime: 2024-05-21 11:51:16
- * @FilePath: \FreeRTOS\Source\tm1650.c
+ * @LastEditTime: 2024-05-22 11:35:42
+ * @FilePath: \ediee:\pengdong\APM32F0xx_SDK_v1.7\Examples\RTOS\FreeRTOS\Source\tm1650.c
  * @Description:
  * 版权声明 保留文件所有权利 2024
  * Copyright (c) 2024 by ${东莞市禹顺智能科技有限公司}, All Rights Reserved.
@@ -37,10 +37,13 @@ uint8_t scintillation_time_count = 0; /* 用于记录闪烁时间的变量，单
 #define tm1650_max 6
 uint16_t *point[tm1650_max] = {&tube_display_buff[0], &up_time_buff, &down_time_buff, &fire_time_buff, &aging_time_buff, &ManualAuto_flag};
 
+
 /**
- * @description: 将模式值，电机上行时间，下行时间，消防时间，老化时间
+ * @brief       将模式值，电机上行时间，下行时间，消防时间，老化时间
  *								 从对应的flash地址中取出
- * @return {*}
+ * @param
+ * @retval
+ * @note        用来做定时任务
  */
 void tm1650_data_init(void)
 {
@@ -52,7 +55,7 @@ void tm1650_data_init(void)
 	for(i = 0; i < tm1650_max; i++)
 	{
 		*point[i] = flash_read_halfword(tm1650_data_addr + i * 2);
-		printf("flash_addr = 0x%08x,flash_id_data = %d\n", tm1650_data_addr + i * 2, *point[i]);
+		// printf("flash_addr = 0x%08x,flash_id_data = %d\n", tm1650_data_addr + i * 2, *point[i]);
 	}
 
 	if(*point[0] == 6)
@@ -60,16 +63,20 @@ void tm1650_data_init(void)
         motor_down();
         temp_time_buff = down_time_buff;
         set_loaded_eventbit9(1);
+        on_off_time_count = 0;
     }
 
 	/* Lock Flash*/
     FMC_Lock();
 }
 
+
 /**
- * @description: 将模式值，电机上行时间，下行时间，消防时间，老化时间
+ * @brief       将模式值，电机上行时间，下行时间，消防时间，老化时间
  *								 写入对应的flash地址
- * @return {*}
+ * @param
+ * @retval
+ * @note        用来做定时任务
  */
 void tm1650_data_write(void)
 {
@@ -94,8 +101,10 @@ void tm1650_data_write(void)
 }
 
 /**
- * @description: 产生IIC总线起始信号
- * @return {*}
+ * @brief       产生IIC总线起始信号
+ * @param
+ * @retval
+ * @note
  */
 static void TM1650_IIC_start(void)
 {
@@ -180,7 +189,7 @@ void TM1650_init(void)
     TM1650_IIC_SCL_HIGH;
 	/* 打开显示且使亮度等级为1 */
 	TM1650_cfg_display(TM1650_BRIGHT1);
-    TM1650_clear();
+//    TM1650_clear();
 }
 
 
@@ -223,6 +232,12 @@ void TM1650_print(uint8_t dig,uint8_t seg_data)
 	TM1650_IIC_stop();
 }
 
+/**
+ * @brief        显示转换函数，将各个位的值拆分出来通过数码管显示
+ * @param        None
+ * @retval       None
+ * @note
+ */
 void display_change(uint16_t buff)
 {
     tube_display_buff[1] = buff/100;
@@ -230,6 +245,13 @@ void display_change(uint16_t buff)
     tube_display_buff[3] = buff%10;
 }
 
+/**
+ * @brief        模式判断函数
+ * @param        None
+ * @retval       None
+ * @note		 以数码管最前面的值来判断应该显示什么数值或
+ * 				 进行怎么样的操作
+ */
 void mode_judge(void)
 {
 
@@ -340,7 +362,7 @@ void mode_judge(void)
 			}
 			break;
 		default:
-			display_change(0);
+			printf("不应该有这种情况，出现改语句表示系统运行错误\r\n");
 			break;
 	}
 }

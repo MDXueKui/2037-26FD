@@ -54,6 +54,12 @@ TaskHandle_t    Rf_Rec_Pro_Task_Handler;  /* 任务句柄 */
  * #define on_eventbit4            (1 << 4)
  * #define off_eventbit5           (1 << 5)
  * #define scintillation_eventbit6 (1 << 6)
+ * #define fire_eventbit7          (1 << 7)
+ * #define aging_eventbit8         (1 << 8)
+ * #define loaded_eventbit9        (1 << 9)
+ * #define cascaded24vR_input_eventbit10       (1 << 10)
+ * #define cascaded24vL_input_eventbit11       (1 << 11)
+ * #define lock_eventbit12                     (1 << 12)
  */
 EventGroupHandle_t EventGroupHandler;       /* 事件标志组句柄 */
 
@@ -65,7 +71,7 @@ int main(void)
     uart_debug_init();
     input_scan_init();
     buzzer_init();
-    TM1650_init();
+    // TM1650_init();
     rf_receive_Init();
     IWDTInit();
     gpio_output_init();
@@ -93,8 +99,12 @@ void start_task(void *pvParameters)
 {
     BaseType_t xResult;
     taskENTER_CRITICAL();           /* 进入临界区 */
-        /* 创建事件标志组 */
+    /* 创建事件标志组 */
     EventGroupHandler = xEventGroupCreate();
+    /* 将该函数放在此处进行初始化的目的是该函数 */
+    /* 而事件标志组列表的初始化是在任务调度之后的 */
+    /* 所以改函数必须放在创建标事件标准组之后且都位于调度开启之后*/
+    TM1650_init();
     /* 创建任务1 */
     xResult = xTaskCreate((TaskFunction_t )Dispaly_Task,                 /* 任务函数 */
                          (const char*    )"Dispaly_Task",               /* 任务名称 */
@@ -122,9 +132,16 @@ void start_task(void *pvParameters)
     printf("Rf_Rec_Pro_Task create %s\r\n", xResult == pdPASS ? "pdTURE" : "pdFALSE");
 
     vTaskDelete(StartTask_Handler); /* 删除开始任务 */
+
     taskEXIT_CRITICAL();            /* 退出临界区 */
 }
 
+/**
+ * @brief       嘀嗒定时器时钟钩子函数（即回调函数）
+ * @param       无
+ * @retval      无
+ * @note        用来做定时任务
+ */
 void vApplicationTickHook(void)
 {
     if (get_scintillation_eventbit6)
@@ -180,6 +197,7 @@ void vApplicationTickHook(void)
         if (temp_time_buff > fire_time_buff)
         {
             temp_time_buff = 0;
+            BUZZER(0);
             motor_stop();
         }
     }

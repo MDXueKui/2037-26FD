@@ -390,64 +390,11 @@
               <FileType>2</FileType>
               <FilePath>..\..\..\..\..\Libraries\Device\Geehy\APM32F0xx\Source\arm\startup_apm32f030.s</FilePath>
             </File>
-            <File>
-              <FileName>startup_apm32f072.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\Libraries\Device\Geehy\APM32F0xx\Source\arm\startup_apm32f072.s</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>0</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Aads>
-                    <interw>2</interw>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <thumb>2</thumb>
-                    <SplitLS>2</SplitLS>
-                    <SwStkChk>2</SwStkChk>
-                    <NoWarn>2</NoWarn>
-                    <uSurpInc>2</uSurpInc>
-                    <useXO>2</useXO>
-                    <uClangAs>2</uClangAs>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Aads>
-                </FileArmAds>
-              </FileOption>
-            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>StdPeriphDriver</GroupName>
           <Files>
-            <File>
-              <FileName>apm32f0xx_adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_adc.c</FilePath>
-            </File>
-            <File>
-              <FileName>apm32f0xx_can.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_can.c</FilePath>
-            </File>
             <File>
               <FileName>apm32f0xx_cec.c</FileName>
               <FileType>1</FileType>
@@ -459,19 +406,9 @@
               <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_comp.c</FilePath>
             </File>
             <File>
-              <FileName>apm32f0xx_crc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_crc.c</FilePath>
-            </File>
-            <File>
               <FileName>apm32f0xx_crs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_crs.c</FilePath>
-            </File>
-            <File>
-              <FileName>apm32f0xx_dac.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_dac.c</FilePath>
             </File>
             <File>
               <FileName>apm32f0xx_dbg.c</FileName>
@@ -487,11 +424,6 @@
               <FileName>apm32f0xx_eint.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_eint.c</FilePath>
-            </File>
-            <File>
-              <FileName>apm32f0xx_fmc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_fmc.c</FilePath>
             </File>
             <File>
               <FileName>apm32f0xx_gpio.c</FileName>
@@ -529,16 +461,6 @@
               <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_rcm.c</FilePath>
             </File>
             <File>
-              <FileName>apm32f0xx_rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_rtc.c</FilePath>
-            </File>
-            <File>
-              <FileName>apm32f0xx_spi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_spi.c</FilePath>
-            </File>
-            <File>
               <FileName>apm32f0xx_syscfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_syscfg.c</FilePath>
@@ -557,6 +479,41 @@
               <FileName>apm32f0xx_wwdt.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_wwdt.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32f0xx_fmc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_fmc.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32f0xx_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32f0xx_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_can.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32f0xx_crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_crc.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32f0xx_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_dac.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32f0xx_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32f0xx_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_spi.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -624,11 +581,6 @@
           <GroupName>FREE_RTOS</GroupName>
           <Files>
             <File>
-              <FileName>croutine.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Middlewares\FreeRTOS\FreeRTOSv202012.00\FreeRTOS\Source\croutine.c</FilePath>
-            </File>
-            <File>
               <FileName>event_groups.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Middlewares\FreeRTOS\FreeRTOSv202012.00\FreeRTOS\Source\event_groups.c</FilePath>
@@ -649,11 +601,6 @@
               <FilePath>..\..\..\..\..\Middlewares\FreeRTOS\FreeRTOSv202012.00\FreeRTOS\Source\queue.c</FilePath>
             </File>
             <File>
-              <FileName>stream_buffer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Middlewares\FreeRTOS\FreeRTOSv202012.00\FreeRTOS\Source\stream_buffer.c</FilePath>
-            </File>
-            <File>
               <FileName>tasks.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Middlewares\FreeRTOS\FreeRTOSv202012.00\FreeRTOS\Source\tasks.c</FilePath>
@@ -667,6 +614,11 @@
               <FileName>port.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Middlewares\FreeRTOS\FreeRTOSv202012.00\FreeRTOS\Source\portable\RVDS\ARM_CM0\port.c</FilePath>
+            </File>
+            <File>
+              <FileName>stream_buffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\FreeRTOS\FreeRTOSv202012.00\FreeRTOS\Source\stream_buffer.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1094,26 +1046,11 @@
                 </FileArmAds>
               </FileOption>
             </File>
-            <File>
-              <FileName>startup_apm32f072.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\Libraries\Device\Geehy\APM32F0xx\Source\arm\startup_apm32f072.s</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>StdPeriphDriver</GroupName>
           <Files>
-            <File>
-              <FileName>apm32f0xx_adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_adc.c</FilePath>
-            </File>
-            <File>
-              <FileName>apm32f0xx_can.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_can.c</FilePath>
-            </File>
             <File>
               <FileName>apm32f0xx_cec.c</FileName>
               <FileType>1</FileType>
@@ -1125,19 +1062,9 @@
               <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_comp.c</FilePath>
             </File>
             <File>
-              <FileName>apm32f0xx_crc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_crc.c</FilePath>
-            </File>
-            <File>
               <FileName>apm32f0xx_crs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_crs.c</FilePath>
-            </File>
-            <File>
-              <FileName>apm32f0xx_dac.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_dac.c</FilePath>
             </File>
             <File>
               <FileName>apm32f0xx_dbg.c</FileName>
@@ -1153,11 +1080,6 @@
               <FileName>apm32f0xx_eint.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_eint.c</FilePath>
-            </File>
-            <File>
-              <FileName>apm32f0xx_fmc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_fmc.c</FilePath>
             </File>
             <File>
               <FileName>apm32f0xx_gpio.c</FileName>
@@ -1195,16 +1117,6 @@
               <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_rcm.c</FilePath>
             </File>
             <File>
-              <FileName>apm32f0xx_rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_rtc.c</FilePath>
-            </File>
-            <File>
-              <FileName>apm32f0xx_spi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_spi.c</FilePath>
-            </File>
-            <File>
               <FileName>apm32f0xx_syscfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_syscfg.c</FilePath>
@@ -1223,6 +1135,41 @@
               <FileName>apm32f0xx_wwdt.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_wwdt.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32f0xx_fmc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_fmc.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32f0xx_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32f0xx_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_can.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32f0xx_crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_crc.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32f0xx_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_dac.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32f0xx_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>apm32f0xx_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\APM32F0xx_StdPeriphDriver\src\apm32f0xx_spi.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1290,11 +1237,6 @@
           <GroupName>FREE_RTOS</GroupName>
           <Files>
             <File>
-              <FileName>croutine.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Middlewares\FreeRTOS\FreeRTOSv202012.00\FreeRTOS\Source\croutine.c</FilePath>
-            </File>
-            <File>
               <FileName>event_groups.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Middlewares\FreeRTOS\FreeRTOSv202012.00\FreeRTOS\Source\event_groups.c</FilePath>
@@ -1315,11 +1257,6 @@
               <FilePath>..\..\..\..\..\Middlewares\FreeRTOS\FreeRTOSv202012.00\FreeRTOS\Source\queue.c</FilePath>
             </File>
             <File>
-              <FileName>stream_buffer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\Middlewares\FreeRTOS\FreeRTOSv202012.00\FreeRTOS\Source\stream_buffer.c</FilePath>
-            </File>
-            <File>
               <FileName>tasks.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Middlewares\FreeRTOS\FreeRTOSv202012.00\FreeRTOS\Source\tasks.c</FilePath>
@@ -1333,6 +1270,11 @@
               <FileName>port.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Middlewares\FreeRTOS\FreeRTOSv202012.00\FreeRTOS\Source\portable\RVDS\ARM_CM0\port.c</FilePath>
+            </File>
+            <File>
+              <FileName>stream_buffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\FreeRTOS\FreeRTOSv202012.00\FreeRTOS\Source\stream_buffer.c</FilePath>
             </File>
           </Files>
         </Group>

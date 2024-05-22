@@ -2,7 +2,7 @@
  * @Author: pengdong 2019262928@qq.com
  * @Date: 2024-04-11 17:07:30
  * @LastEditors: pengdong 2019262928@qq.com
- * @LastEditTime: 2024-05-20 19:48:32
+ * @LastEditTime: 2024-05-21 16:37:06
  * @FilePath: \FreeRTOS\Include\gpio_output.h
  * @Description: gpio输出控制头文件
  * 版权声明 保留文件所有权利 2024
@@ -50,17 +50,17 @@ extern "C" {
 // #define controlfeedback_GPIO_PORT          GPIOB
 // #define controlfeedback_GPIO_CLK           RCM_AHB_PERIPH_GPIOB
 
-#define LED1_GPIO_PIN                      GPIO_PIN_0
-#define LED1_GPIO_PORT                     GPIOA
-#define LED1_GPIO_CLK                      RCM_AHB_PERIPH_GPIOA
+#define LED1_GPIO_PIN                      GPIO_PIN_14
+#define LED1_GPIO_PORT                     GPIOC
+#define LED1_GPIO_CLK                      RCM_AHB_PERIPH_GPIOC
 
 #define LED2_GPIO_PIN                      GPIO_PIN_15
 #define LED2_GPIO_PORT                     GPIOC
 #define LED2_GPIO_CLK                      RCM_AHB_PERIPH_GPIOC
 
-#define LED3_GPIO_PIN                      GPIO_PIN_14
-#define LED3_GPIO_PORT                     GPIOC
-#define LED3_GPIO_CLK                      RCM_AHB_PERIPH_GPIOC
+#define LED3_GPIO_PIN                      GPIO_PIN_0
+#define LED3_GPIO_PORT                     GPIOA
+#define LED3_GPIO_CLK                      RCM_AHB_PERIPH_GPIOA
 /* 自动模式下LED4亮，手动模式下灭 */
 #define LED4_GPIO_PIN                      GPIO_PIN_1
 #define LED4_GPIO_PORT                     GPIOA

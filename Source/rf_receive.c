@@ -1,7 +1,7 @@
 #include "rf_receive.h"
 #include "gpio_output.h"
 
-#define id_data_max 10
+#define id_data_max 10 //学码最大记录个数
 uint8_t g_rec_long = 0;
 static uint8_t g_data_recling[8] = {0};
 static uint8_t g_data_recbuf[8] = {0};
@@ -236,62 +236,90 @@ void rf_data_pro(void)
 	{
 		case 0x01:
 			buzzer_quick_100ms();
-			if(tube_display_buff[0] == 1)
-			{
-				motor_up();
-			}
-			else if(tube_display_buff[0] == 5 && ManualAuto_flag &&\
-				(GPIO_ReadOutputBit(firefeedback_output_PORT, firefeedback_output_GPIO_PIN)))
-			{
-				motor_up();
-				BUZZER(1);
-				set_fire_eventbit7(1);
-			}
-			else if(tube_display_buff[0] == 6 && (!get_fire_eventbit7))
-			{
-				motor_up();
-			}
-			else
-			{
-				motor_on_all();
-			}
+            if(get_lock_eventbit12)
+            {
+                vTaskDelay(10);
+            }
+            else
+            {
+                if(tube_display_buff[0] == 1)
+                {
+                    motor_up();
+                }
+                else if(tube_display_buff[0] == 5 && ManualAuto_flag &&\
+                    (GPIO_ReadOutputBit(firefeedback_output_PORT, firefeedback_output_GPIO_PIN)))
+                {
+                    motor_up();
+                    BUZZER(1);
+                    set_fire_eventbit7(1);
+                }
+                else if(tube_display_buff[0] == 6 && (!get_fire_eventbit7))
+                {
+                    motor_up();
+                }
+                else
+                {
+                    motor_on_all();
+                }
+            }
 			break;
 		case 0x02:
 			buzzer_quick_100ms();
-			if(tube_display_buff[0] == 1)
-			{
-				motor_stop();
-			}
-			else if(tube_display_buff[0] == 6 && (!get_fire_eventbit7))
-			{
-				motor_stop();
-			}
-			else
-			{
-				stop_motor();
-			}
+            if(get_lock_eventbit12)
+            {
+                vTaskDelay(10);
+            }
+            else
+            {
+                if(tube_display_buff[0] == 1)
+                {
+                    motor_stop();
+                }
+                else if(tube_display_buff[0] == 6 && (!get_fire_eventbit7))
+                {
+                    motor_stop();
+                }
+                else
+                {
+                    stop_motor();
+                }
+            }
 			break;
 		case 0x04:
-			buzzer_quick_100ms();
-			if(tube_display_buff[0] == 1)
-			{
-				motor_down();
-			}
-			else if(tube_display_buff[0] == 6 && (!get_fire_eventbit7))
-			{
-				motor_down();
-			}
-			else
-			{
-				motro_off_all();
-			}
+            buzzer_quick_100ms();
+            if(get_lock_eventbit12)
+            {
+                vTaskDelay(10);
+            }
+            else
+            {
+                if(tube_display_buff[0] == 1)
+                {
+                    motor_down();
+                }
+                else if(tube_display_buff[0] == 6 && (!get_fire_eventbit7))
+                {
+                    motor_down();
+                }
+                else
+                {
+                    motro_off_all();
+                }
+            }
 			break;
 		case 0x0f:
-			if(tube_display_buff[0] == 1)
-			{
-				buzzer_quick_100ms();
-				motor_stop();
-			}
+            if(get_lock_eventbit12)
+            {
+                vTaskDelay(10);
+            }
+            else
+            {
+                if(tube_display_buff[0] == 1)
+                {
+                    buzzer_quick_100ms();
+                    motor_stop();
+                }
+            }
 		default:
 			break;
 	}

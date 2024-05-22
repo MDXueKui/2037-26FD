@@ -89,13 +89,10 @@ void HardFault_Handler(void)
 {
 }
 
-/*!
- * @brief        This function handles TMR14 Handler
- *
+/**
+ * @brief        定时器6的超时中断函数
  * @param        None
- *
  * @retval       None
- *
  * @note
  */
 void TMR6_IRQHandler(void)

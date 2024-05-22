@@ -2,7 +2,7 @@
  * @Author: pengdong 2019262928@qq.com
  * @Date: 2024-04-11 17:03:42
  * @LastEditors: pengdong 2019262928@qq.com
- * @LastEditTime: 2024-05-18 17:30:13
+ * @LastEditTime: 2024-05-21 15:33:02
  * @FilePath: \FreeRTOS\Source\buzzer.c
  * @Description: 蜂鸣器驱动程序
  * 版权声明 保留文件所有权利 2024
@@ -68,6 +68,7 @@ void buzzer_init(void)
  */
 void buzzer_quick_3s(void)
 {
+    BUZZER(0);
     uint8_t work_count = 0;
     while(work_count < 3)
     {

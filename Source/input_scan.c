@@ -11,6 +11,8 @@
 #include "event_groups.h"
 
 extern EventGroupHandle_t EventGroupHandler;
+void reset_pres_fun(void);
+uint8_t stop_time_count = 0;
 
 #define key_up_eventbit2    (1 << 2)
 #define set_key_up(x)       \
@@ -89,12 +91,12 @@ uint8_t input_scan(void)
     {
         vTaskDelay(10); /* 延时10ms消抖 */
         set_key_up(1);
-
-        if((!ON_KEY) && (!OFF_KEY) && (!get_fire_eventbit7))
+        if ((!ON_KEY) && (!OFF_KEY) && (!get_fire_eventbit7))
         {
             buzzer_quick_100ms();
-            if((tube_display_buff[0] == 6 || \
-                tube_display_buff[0] == 1) && (!get_fire_eventbit7))
+            if ((tube_display_buff[0] == 6 ||
+                 tube_display_buff[0] == 1) &&
+                (!get_fire_eventbit7))
             {
                 motor_stop();
             }
@@ -103,51 +105,51 @@ uint8_t input_scan(void)
                 stop_motor();
             }
         }
-        else if (ADD_KEY == 0 && SBU_KEY == 0)
+        else if (ADD_KEY == 0 && SBU_KEY == 0 && (!get_fire_eventbit7))
         {
             keyval = SET_PRES;
         }
-        else if (ADD_KEY == 0)
+        else if (ADD_KEY == 0 && (!get_fire_eventbit7))
         {
             keyval = ADD_PRES;
         }
-        else if (SBU_KEY == 0)
+        else if (SBU_KEY == 0 && (!get_fire_eventbit7))
         {
             keyval = SBU_PRES;
         }
-        else if (RESET_KEY == 0)
+        else if (RESET_KEY == 0 )
         {
             keyval = RESET_KEY_PRES;
         }
-        else if (ON_KEY == 0)
+        else if (ON_KEY == 0 && (!get_fire_eventbit7) && (!get_lock_eventbit12))
         {
             keyval = ON_PRES;
         }
-        else if (OFF_KEY == 0)
+        else if (OFF_KEY == 0 && (!get_fire_eventbit7) && (!get_lock_eventbit12))
         {
             keyval = OFF_PRES;
         }
-        else if (fire_control_input_KEY == 0)
+        else if (fire_control_input_KEY == 0 && (!get_fire_eventbit7))
         {
             keyval = fire_control_input_Triggering;
         }
-        else if (fire_control24v_input_KEY == 0)
+        else if (fire_control24v_input_KEY == 0 && (!get_fire_eventbit7))
         {
             keyval = fire_control24v_input_Triggering;
         }
-        else if (cascaded24vR_input_KEY == 0)
+        else if (cascaded24vR_input_KEY == 0 && (!get_fire_eventbit7) && (!get_lock_eventbit12))
         {
             keyval = cascaded24vR_input_Triggering;
         }
-        else if (cascaded24vL_input_KEY == 0)
+        else if (cascaded24vL_input_KEY == 0 && (!get_fire_eventbit7) && (!get_lock_eventbit12))
         {
             keyval = cascaded24vL_input_Triggering;
         }
-        else if (rain_input_KEY == 0)
+        else if (rain_input_KEY == 0 && (!get_fire_eventbit7) && (!get_lock_eventbit12))
         {
             keyval = rain_input_Triggering;
         }
-        else if (MOSI_KEY == 0)
+        else if (MOSI_KEY == 0 && (!get_fire_eventbit7) && (!get_lock_eventbit12))
         {
             keyval = MOSI_Triggering;
         }
@@ -158,6 +160,33 @@ uint8_t input_scan(void)
             cascaded24vL_input_KEY == 1 && rain_input_KEY == 1 && MOSI_KEY == 1) /* 无任何键按下继续等待 */
     {
         set_key_up(0);
+        stop_time_count = 0;
+        if(tube_display_buff[0] == 1 && \
+                (g_out_data1 == 0x0f || g_out_data1 == 0))
+        {
+            motor_stop();
+        }
+
+        if(get_cascaded24vR_input_eventbit10 || get_cascaded24vL_input_eventbit11)
+        {
+            set_cascaded24vR_input_eventbit10(0);
+            set_cascaded24vL_input_eventbit11(0);
+            motor_stop();
+        }
+    }
+
+    if ((!ON_KEY) && (!OFF_KEY))
+    {
+        vTaskDelay(500);
+        if ((!ON_KEY) && (!OFF_KEY))
+        {
+            stop_time_count++;
+            if(stop_time_count >= 10)
+            {
+                keyval = RESET_KEY_PRES;
+                stop_time_count = 0;
+            }
+        }
     }
 
     return keyval; /* 返回对应键值 */
@@ -190,15 +219,27 @@ void Timer1Callback(TimerHandle_t xTimer)
             xTimerStop((TimerHandle_t)Timer1Timer_Handler, /* 待停止的定时器句柄 */
                        (TickType_t)portMAX_DELAY);         /* 等待系统停止定时器的最大时间 */
         }
-        else
-        {
-
-        }
     }
 
-    if (count >= 10)
+    if (count >= 10 && (ON_KEY && OFF_KEY))
     {
         set_learn_eventbit_1(1);
+    }
+    else if(count >= 20 && !ON_KEY && tube_display_buff[0] == 6)
+    {
+        count = 0;
+        set_lock_eventbit12(1);
+        buzzer_quick_3s();
+        xTimerStop((TimerHandle_t)Timer1Timer_Handler, /* 待停止的定时器句柄 */
+                       (TickType_t)portMAX_DELAY);         /* 等待系统停止定时器的最大时间 */
+    }
+    else if(count >= 20 && !OFF_KEY && tube_display_buff[0] == 6)
+    {
+        count = 0;
+        set_lock_eventbit12(0);
+        buzzer_quick_3s();
+        xTimerStop((TimerHandle_t)Timer1Timer_Handler, /* 待停止的定时器句柄 */
+                       (TickType_t)portMAX_DELAY);         /* 等待系统停止定时器的最大时间 */
     }
 
     if(get_learn_eventbit_1)
@@ -288,46 +329,49 @@ void sbu_pres_fun(void)
         }
     }
     /* 查询系统历史剩余最小内存 */
-    printf("FreeRTO总内存大小：%d 字节\r\n",configTOTAL_HEAP_SIZE);//打印FreeRTOS总内存大小（单位字节）
-    printf("当前剩余堆内存大小：%d 字节\r\n", xPortGetFreeHeapSize());//查询当前剩余堆内存大小
-    printf("历史剩余最小内存大小：%d 字节\r\n\r\n",xPortGetMinimumEverFreeHeapSize());//查询历史剩余最小内存大小
+//    printf("FreeRTO总内存大小：%d 字节\r\n",configTOTAL_HEAP_SIZE);//打印FreeRTOS总内存大小（单位字节）
+//    printf("当前剩余堆内存大小：%d 字节\r\n", xPortGetFreeHeapSize());//查询当前剩余堆内存大小
+//    printf("历史剩余最小内存大小：%d 字节\r\n\r\n",xPortGetMinimumEverFreeHeapSize());//查询历史剩余最小内存大小
 }
 
 void reset_pres_fun(void)
 {
-    char *task_info_buf  = NULL;
-    char *runtime_info = NULL;
+    // char *task_info_buf  = NULL;
+    // char *runtime_info = NULL;
 
     if(get_on_eventbit4 || get_off_eventbit5)
     {
-        tube_display_buff[0] = 2;
         set_on_eventbit4(0);
         set_off_eventbit5(0);
+        tube_display_buff[0] = 2;
+        set_fire_eventbit7(0);
     }
     set_fire_eventbit7(0);
-    set_flashw_eventbit3(1);
     firefeedback_output(0);
     LED2(0);
-    motor_stop();
-
-        /* 第四步：函数vTaskList()的使用 */
-    task_info_buf = pvPortMalloc(200);
-    vTaskList(task_info_buf);                                       /* 获取所有任务的信息 */
-    printf("任务名\t\t状态\t优先级\t剩余栈\t任务序号\r\n");
-    printf("%s\r\n", task_info_buf);
-    runtime_info = pvPortMalloc(200);
-    vTaskGetRunTimeStats(runtime_info); /* 获取任务运行时间信息 */
-    printf("任务名\t\t 运行时间\t 运行所占百分比\r\n");
-    printf("%s\r\n", runtime_info);
-    /* 释放内存 */
-    if (NULL != task_info_buf && NULL != runtime_info)
+    if(tube_display_buff[0] != 6)
     {
-        vPortFree(task_info_buf);
-        vPortFree(runtime_info);
-        task_info_buf = NULL;
-        runtime_info = NULL;
+        motor_stop();
     }
-    printf("/************************实验结束***************************/\r\n");
+
+    //     /* 第四步：函数vTaskList()的使用 */
+    // task_info_buf = pvPortMalloc(200);
+    // vTaskList(task_info_buf);                                       /* 获取所有任务的信息 */
+    // printf("任务名\t\t状态\t优先级\t剩余栈\t任务序号\r\n");
+    // printf("%s\r\n", task_info_buf);
+    // runtime_info = pvPortMalloc(200);
+    // vTaskGetRunTimeStats(runtime_info); /* 获取任务运行时间信息 */
+    // printf("任务名\t\t 运行时间\t 运行所占百分比\r\n");
+    // printf("%s\r\n", runtime_info);
+    // /* 释放内存 */
+    // if (NULL != task_info_buf && NULL != runtime_info)
+    // {
+    //     vPortFree(task_info_buf);
+    //     vPortFree(runtime_info);
+    //     task_info_buf = NULL;
+    //     runtime_info = NULL;
+    // }
+    // printf("/************************实验结束***************************/\r\n");
 }
 
 void set_pres_fun(void)
@@ -401,12 +445,13 @@ void fire_pres_fun(void)
     switch (tube_display_buff[0])
     {
     case 6:
-        printf("test\r\n");
-        firefeedback_output(1);
-        motor_up();
-        BUZZER(1);
-        LED2(1);
         set_fire_eventbit7(1);
+        motor_stop();
+        LED2(1);
+        BUZZER(1);
+        firefeedback_output(1);
+        vTaskDelay(1000);
+        motor_up();
         break;
     default:
         fire_proc();
@@ -452,6 +497,7 @@ void Input_Scan_Task(void *parameter)
         case OFF_PRES:
             buzzer_quick_100ms();
             off_pres_fun();
+            break;
         case fire_control_input_Triggering:
             buzzer_quick_100ms();
             fire_pres_fun();
@@ -466,7 +512,13 @@ void Input_Scan_Task(void *parameter)
             break;
         case cascaded24vR_input_Triggering:
             buzzer_quick_100ms();
-            // fire_pres_fun();
+            set_cascaded24vR_input_eventbit10(1);
+            motor_up();
+            break;
+        case cascaded24vL_input_Triggering:
+            buzzer_quick_100ms();
+            set_cascaded24vL_input_eventbit11(1);
+            motor_down();
             break;
         case MOSI_Triggering:
             buzzer_quick_100ms();
